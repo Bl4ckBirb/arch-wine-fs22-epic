@@ -1,6 +1,6 @@
-FROM toetje585/arch-wine-vnc:latest
-LABEL org.opencontainers.image.authors = "Toetje585"
-LABEL org.opencontainers.image.source = "https://github.com/wine-gameservers/arch-wine-vnc"
+FROM ghcr.io/bl4ckbirb/arch-wine-vnc:main
+LABEL org.opencontainers.image.authors = "Bl4ckBirb"
+LABEL org.opencontainers.image.source = "https://github.com/Bl4ckBirb/arch-wine-fs22-epic"
 
 # additional files
 ##################
