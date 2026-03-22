@@ -6,7 +6,7 @@ set -e
 
 echo "[info] Installing packages currently not installed..."
 pacman -Syu --noconfirm && pacman -S nginx-mainline firefox python-pip --noconfirm
-pip install legendary-gl
+pip install legendary-gl --break-system-packages
 
 # create file with contents of here doc, note EOF is NOT quoted to allow us to expand current variable 'install_paths'
 # we use escaping to prevent variable expansion for PUID and PGID, as we want these expanded at runtime of init.sh
