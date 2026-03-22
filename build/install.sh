@@ -79,14 +79,15 @@ fi
 EOF
 
 # replace env vars placeholder string with contents of file (here doc)
-
 sed -i '/# ENVVARS_PLACEHOLDER/{
     s/# ENVVARS_PLACEHOLDER//g
     r /tmp/envvars_heredoc
 }' /usr/local/bin/init.sh
 rm /tmp/envvars_heredoc
 
-# Symlinks
+# Ensure scripts are executable
+chmod +x /opt/fs22/*.sh
 
+# Symlinks
 ln -s /opt/fs22/setup_server.sh /home/nobody/setup_server.sh
 ln -s /opt/fs22/start_webserver.sh /home/nobody/start_webserver.sh
