@@ -22,8 +22,6 @@ Note: DLC support might not work as i do not own any and therefore cannot test i
   * [Starting the container](#starting-the-container)
   * [Connecting to the VNC Server](#connecting-to-the-vnc-Server)
 	* [Server Installation](#server-installation)
-    * [Login to Epic Games](#login-to-epic-games)
-    * [Install the game](#install-the-game)
     * [Running the setup](#running-the-setup)
 		* [Starting the admin portal](#starting-the-admin-portal)
 * [Environment variables](#environment-variables)
@@ -150,7 +148,7 @@ $ docker run -d \
 
 To ensure that the installation remains intact even if you remove or update the Docker container, it is important to configure specific directories on the host side. A common practice is to place these directories in `/opt`, although you can choose any other preferred mount point according to your needs and preferences.
 
-`$sudo mkdir -p /opt/fs22/{config,game}`
+`sudo mkdir -p /opt/fs22/{config,game}`
 
 To enable read and write access for the user account configured in the compose file (PUID/PGID), we need to ensure that the Docker container can interact with the designated directory. This can be achieved by executing the following command, which grants the necessary permissions:
 
@@ -209,33 +207,18 @@ Replace `ip` with the actual IP address of the server.
 
 # Server Installation
 
-## Login to Epic Games
-
-Open up the terminal, and run the below commands.
-
-Login to Epic Games - This will open firefox with the login page. (Ignore the errors in the terminal)
-```bash
-legendary auth
-```
-After you log in, copy the shown authorization code and paste it in the terminal.
-
-## Install the game
-
-```bash
-legendary list && legendary install "Farming Simulator 22" -y --max-workers 4 --base-path /opt/fs22/game/
-```
-This will download and install the game.
-
 ## Running the setup
 
-`$./setup_server.sh`
-
-This completes the setup by creating the wine prefix and other configs. 
+Open up the terminal, and run the below command.
+```bash
+./setup_server.sh
+```
+This will guide you through the epic games login, installing the game and completes the setup by creating the wine prefix and configs. 
 
 ## Starting the admin portal
-
-`$./start_webserver.sh`
-
+```bash
+./start_webserver.sh
+```
 Check if the webserver is working by going to localhost:8080 in the browser inside the vnc connection or ip:8080 on an external machine.
 
 # Environment variables

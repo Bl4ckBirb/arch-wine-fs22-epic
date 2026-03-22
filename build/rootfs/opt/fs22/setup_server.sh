@@ -12,6 +12,45 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 
+# Login to epic games and filter out firefox dbus errors
+legendary auth 2> >(
+  sed -E '
+    s/ \[[0-9]+\] Sandbox: CanCreateUserNamespace\(\) clone\(\) failure: EPERM$//;
+    s/^WARNING: Glycin running without sandbox\.$//;
+    s/^\[Parent [0-9]+, Main Thread\] WARNING: Failed to create DBus proxy for org\.a11y\.Bus:.*$//;
+    s/^\[Parent [0-9]+, Main Thread\] WARNING: Failed to create DBus proxy for org\.freedesktop\.UPower:.*$//;
+    s/^: '\''glib warning'\'', file .*nsSigHandlers\.cpp:201$//;
+    s/^\*\* \(firefox:[0-9]+\): WARNING \*\*: .*Failed to create DBus proxy for org\.a11y\.Bus:.*$//;
+    s/^\*\* \(firefox:[0-9]+\): WARNING \*\*: .*Failed to create DBus proxy for org\.freedesktop\.UPower:.*$//;
+    s/^libEGL warning: DRI3 error: Could not get DRI3 device$//;
+    s/^libEGL warning: Ensure your X server supports DRI3 to get accelerated rendering$//;
+    /^[[:space:]]*$/d
+  ' >&2
+)
+if legendary status | grep -Fq 'not logged in'
+then
+    echo -e "${RED}Error: Login failed, exiting.${NOCOLOR}" && exit 1
+fi
+
+# Check if the account owns FS22
+if legendary list | grep -Fq 'Farming Simulator 22'
+then
+  echo -e "${GREEN}INFO: FS22 is owned by this Epic Games account, starting the installation ...${NOCOLOR}"
+else
+  echo -e "${RED}Error: This Epic Games account does not own Farming Simulator 22!${NOCOLOR}" && exit 1
+fi
+
+# Download and install the game
+legendary install "Farming Simulator 22" -y --max-workers 4 --base-path /opt/fs22/game/
+
+# Check if install finished successfully
+if legendary list-installed | grep -Fq 'Farming Simulator 22'
+then
+    echo -e "${GREEN}Game installed successfully.${NOCOLOR}"
+else    
+    echo -e "${RED}Error: Game install failed!${NOCOLOR}" && exit 1
+fi
+
 # Create a clean 64bit Wineprefix
 if [ -d ~/.fs22server ]
 then
