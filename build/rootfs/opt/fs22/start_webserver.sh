@@ -5,9 +5,9 @@ export WINEPREFIX=~/.fs22server
 
 # Start the server
 
-if [ -f ~/.fs22server/drive_c/Program\ Files\ \(x86\)/Farming\ Simulator\ 2022/dedicatedServer.exe ]
+if [ -f /opt/fs22/game/FarmingSimulator22/dedicatedServer.exe ]
 then
-    wine ~/.fs22server/drive_c/Program\ Files\ \(x86\)/Farming\ Simulator\ 2022/dedicatedServer.exe
+    legendary launch "Farming Simulator 22" --wine-prefix ~/.fs22server --override-exe /opt/fs22/game/FarmingSimulator22/dedicatedServer.exe
 else
     echo "Game not installed?" && exit
 fi

@@ -1,11 +1,11 @@
 docker run -d \
-    --name arch-wine-fs22 \
+    --name arch-wine-fs22-epic \
+    --shm-size="3g" \
     -p 5900:5900/tcp \
     -p 8080:8080/tcp \
     -p 10823:10823/tcp \
     -p 10823:10823/udp \
     -v /etc/localtime:/etc/localtime:ro \
-    -v /opt/fs22/installer:/opt/fs22/installer \
     -v /opt/fs22/config:/opt/fs22/config \
     -v /opt/fs22/game:/opt/fs22/game \
     -e PUID=<UID from user> \
@@ -25,4 +25,4 @@ docker run -d \
     -e SERVER_SAVE_INTERVAL="180.000000" \
     -e SERVER_STATS_INTERVAL="31536000" \
     -e SERVER_CROSSPLAY="true" \
-    toetje585/arch-wine-fs22
+    ghcr.io/bl4ckbirb/arch-wine-fs22-epic:latest

@@ -8,6 +8,7 @@ LABEL org.opencontainers.image.source = "https://github.com/Bl4ckBirb/arch-wine-
 COPY build/rootfs /
 
 RUN chown -R nobody:nobody /home/*
+RUN chown -R nobody:nobody /opt/fs22/*
 
 # add install bash script
 ADD build/install.sh /root/install.sh
