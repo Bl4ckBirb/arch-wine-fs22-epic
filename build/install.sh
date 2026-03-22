@@ -5,7 +5,8 @@ set -e
 # needed packages
 
 echo "[info] Installing packages currently not installed..."
-pacman -Syu --noconfirm && pacman -S nginx-mainline --noconfirm
+pacman -Syu --noconfirm && pacman -S nginx-mainline firefox python-pip --noconfirm
+pip install legendary-gl
 
 # create file with contents of here doc, note EOF is NOT quoted to allow us to expand current variable 'install_paths'
 # we use escaping to prevent variable expansion for PUID and PGID, as we want these expanded at runtime of init.sh
@@ -87,5 +88,5 @@ rm /tmp/envvars_heredoc
 
 # Symlinks
 
-ln -s /opt/fs22/setup_giants.sh /home/nobody/setup_giants.sh
+ln -s /opt/fs22/setup_server.sh /home/nobody/setup_server.sh
 ln -s /opt/fs22/start_webserver.sh /home/nobody/start_webserver.sh

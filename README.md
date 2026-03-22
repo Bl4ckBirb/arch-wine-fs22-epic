@@ -1,7 +1,9 @@
 # Farming Simulator 22 Docker Server
 
 Dedicated Farming Simulator 22 server running inside a docker image based on ArchLinux. 
-This project is hosted at https://github.com/wine-gameservers/arch-wine-fs22/
+This fork is set up to use the Epic Games version of FS22 by using [Legendary](https://github.com/derrod/legendary).
+
+Note: DLC support might not work as i do not own any and therefore cannot test it.
 
 ## Table of contents
 <!-- vim-markdown-toc GFM -->
@@ -16,14 +18,13 @@ This project is hosted at https://github.com/wine-gameservers/arch-wine-fs22/
 	* [Deploying with docker-compose](#docker-compose)
 	* [Deploying with docker run](#docker-run)
 * [Installation](#installation)
-	* [Initial installation](#initial-installation)
-		* [Downloading the dedicated server](#downloading-the-dedicated-server)
-		* [Preparing the needed directories on the host machine](#preparing-the-needed-directories-on-the-host-machine)
-		* [Unpack and move the installer](#unpack-and-move-the-installer)
-		* [Starting the container](#starting-the-container)
-		* [Connecting to the VNC Server](#connecting-to-the-vnc-Server)
+  * [Preparing the needed directories on the host machine](#preparing-the-needed-directories-on-the-host-machine)
+  * [Starting the container](#starting-the-container)
+  * [Connecting to the VNC Server](#connecting-to-the-vnc-Server)
 	* [Server Installation](#server-installation)
-		* [Running the installation](#running-the-installation)
+    * [Login to Epic Games](#login-to-epic-games)
+    * [Install the game](#install-the-game)
+    * [Running the setup](#running-the-setup)
 		* [Starting the admin portal](#starting-the-admin-portal)
 * [Environment variables](#environment-variables)
 <!-- vim-markdown-toc -->
@@ -38,7 +39,7 @@ While renting a server remains a viable option for certain players, it has becom
 
 # Getting Started
 
-Please note that this may not cover every possible scenario, particularly for NAS (synology) users. In such cases, you may need to utilize the provided admin console to configure the necessary directories and user permissions. If you encounter any issues while attempting to run the program, kindly refrain from sending me private messages. Instead, we recommend seeking assistance on our Discord server, where you can find additional support and guidance. [invite link to our Discord server](https://discord.gg/Ejz2MaXSNb). 
+Please note that this may not cover every possible scenario, particularly for NAS (synology) users. In such cases, you may need to utilize the provided admin console to configure the necessary directories and user permissions. If you encounter any issues while attempting to run the program, kindly refrain from sending me private messages, instead please create an [issue](https://github.com/Bl4ckBirb/arch-wine-fs22-epic/issues) in this GitHub repository. 
 
 ## Hardware Requirements
 
@@ -59,13 +60,8 @@ To install Docker and Docker Compose, please consult the documentation specific 
 
 ### Server License
 
-GIANTS Software provides a dedicated server tool with the game, which means that in order to run a server, you will need to purchase an additional license from GIANTS. It is not possible to host and play on the same server using a single license. Therefore, you will need to buy everything twice in order to both run the server and play on it.
-
-Please note that the Steam version of the game is not supported for running as a server inside a Docker environment. However, you can use the Steam version to play on the server.
-
-To obtain the full game and all DLCs, we recommend purchasing the Farming Simulator 22 Premium Edition. This edition provides access to all the content, and it is the most cost-effective option to unlock all the game's features. Please be cautious about other versions available, as this edition ensures the inclusion of all the content you need.
-
-- [Farming Simulator 22 Premium Edition](https://www.farming-simulator.com/buy-now.php?lang=en&country=nl&platform=pcdigital)
+This project is only set up for the Epic Games version of the game. The Steam version is not supported.
+To use the game version directly bought from Giants please use https://github.com/wine-gameservers/arch-wine-fs22/
 
 ### VNC Client
 
@@ -80,9 +76,10 @@ The primary distinction between `docker run` and `docker-compose` is that `docke
 ### Docker compose
 ```
 services:
-  arch-wine-fs22:
-    image: toetje585/arch-wine-fs22:latest
-    container_name: arch-wine-fs22
+  arch-wine-fs22-epic:
+    image: ghcr.io/bl4ckbirb/arch-wine-fs22-epic:latest
+    container_name: arch-wine-fs22-epic
+    shm_size: 3gb  #legendary install/download fails without this
     environment:
       - VNC_PASSWORD=<your vnc password>
       - WEB_USERNAME=<dedicated server portal username>
@@ -105,8 +102,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /opt/fs22/config:/opt/fs22/config
       - /opt/fs22/game:/opt/fs22/game
-      - /opt/fs22/dlc:/opt/fs22/dlc
-      - /opt/fs22/installer:/opt/fs22/installer
     ports:
       - 5900:5900/tcp
       - 8080:8080/tcp
@@ -120,17 +115,16 @@ services:
 ### Docker run
 ```
 $ docker run -d \
-    --name arch-wine-fs22 \
+    --name arch-wine-fs22-epic \
+    --shm-size="3g" \
     -p 5900:5900/tcp \
     -p 8080:8080/tcp \
     -p 9000:9000/tcp \
     -p 10823:10823/tcp \
     -p 10823:10823/udp \
     -v /etc/localtime:/etc/localtime:ro \
-    -v /opt/fs22/installer:/opt/fs22/installer \
     -v /opt/fs22/config:/opt/fs22/config \
     -v /opt/fs22/game:/opt/fs22/game \
-    -v /opt/fs22/dlc:/opt/fs22/dlc \
     -e VNC_PASSWORD="<your vnc password>" \
     -e WEB_USERNAME="<dedicated server portal username>" \
     -e WEB_PASSWORD="<dedicated server portal password>" \
@@ -148,29 +142,15 @@ $ docker run -d \
     -e SERVER_CROSSPLAY="true" \
     -e PUID=<UID from user> \
     -e PGID=<PGID from user> \
-    toetje585/arch-wine-fs22
+    ghcr.io/bl4ckbirb/arch-wine-fs22-epic:latest
 ```
 # Installation
-
-## Initial installation
-
-Before starting the Docker container, it is necessary to go through the initial configuration process. Unlike many other games that provide standalone server binaries, Farming Simulator does not offer this option. Instead, the required files are included in the digital download package. To obtain these files, you will need to download the full game (ZIP Version) and all DLC from the [Download Portal](https://eshop.giants-software.com/downloads.php).
-
-We will provide more detailed instructions below, but rest assured that the installation process is a one-time requirement. If the compose file is correctly configured with the correct mount paths, you will not lose the installation or configuration files even if you remove or purge the Docker image/container.
-
-## Downloading the dedicated server
-
-If you purchased the game or already have a product key you can download the game/dlc on the host machine from the [Download Portal](https://eshop.giants-software.com/downloads.php)
-
-- Farming Simulator 22 (ZIP Archive) 
-
-The DLC files are often just an .exe executable you can download them, we move them into the right place later on.
 
 ## Preparing the needed directories on the host machine
 
 To ensure that the installation remains intact even if you remove or update the Docker container, it is important to configure specific directories on the host side. A common practice is to place these directories in `/opt`, although you can choose any other preferred mount point according to your needs and preferences.
 
-`$sudo mkdir -p /opt/fs22/{config,game,installer,dlc}`
+`$sudo mkdir -p /opt/fs22/{config,game}`
 
 To enable read and write access for the user account configured in the compose file (PUID/PGID), we need to ensure that the Docker container can interact with the designated directory. This can be achieved by executing the following command, which grants the necessary permissions:
 
@@ -204,19 +184,6 @@ Example:
 - PGID=1000
 ```
 
-## Unpack and move the installer
-
-You should now unpack the installer and place the unzipped files inside the */your/path/fs22/installer* directory, all dlc should be placed in the */your/path/fs22/dlc* directory. If we start the docker container those directories will be mapped inside the container hence making them available for installation.
-
-*Note: left mounth paths are on the host machine, the right mount path is inside the docker image and should be left untouched*
-
-```
-- /your/path/fs22/installer:/opt/fs22/installer
-- /your/path/fs22/config:/opt/fs22/config
-- /your/path/fs22/game:/opt/fs22/game
-- /your/path/fs22/dlc:/opt/fs22/dlc
-```
-
 ## Starting the container
 
 With the host directories configured and the compose file set up accordingly, you are now ready to start the container.
@@ -242,19 +209,34 @@ Replace `ip` with the actual IP address of the server.
 
 # Server Installation
 
-## Running the installation
+## Login to Epic Games
 
-Open up the terminal, and run the below command.
+Open up the terminal, and run the below commands.
 
-`$./setup_giants.sh`
+Login to Epic Games - This will open firefox with the login page. (Ignore the errors in the terminal)
+```bash
+legendary auth
+```
+After you log in, copy the shown authorization code and paste it in the terminal.
 
-This should run the installer, complete the installation. After the installation is completed we can start the server by using the below command.
+## Install the game
+
+```bash
+legendary list && legendary install "Farming Simulator 22" -y --max-workers 4 --base-path /opt/fs22/game/
+```
+This will download and install the game.
+
+## Running the setup
+
+`$./setup_server.sh`
+
+This completes the setup by creating the wine prefix and other configs. 
 
 ## Starting the admin portal
 
 `$./start_webserver.sh`
 
-We don't have a browser inside the VNC Desktop, check if the server is working by going to ip:8080 on a other machine!
+Check if the webserver is working by going to localhost:8080 in the browser inside the vnc connection or ip:8080 on an external machine.
 
 # Environment variables
 
@@ -279,15 +261,5 @@ Getting the PUID and GUID is explained [here](https://man7.org/linux/man-pages/m
 | `PUID` || PUID of username used on the local machine |
 | `GUID` || GUID of username used on the local machine |
 
-# Discord
-
-Need support or like to contribute towards our community you can try to join our Discord server.
-
-https://discord.gg/Ejz2MaXSNb
-
 # Legal disclaimer
 This Docker container is not endorsed by, directly affiliated with, maintained, authorized, or sponsored by [Giants Software](https://giants-software.com) and [Farming Simulator 22](https://farming-simulator.com/). The logo [Farming Simulator 22](https://giants-software.com) are © 2023 Giants Software.
-
-# Notes
-
-13-05-2024: Force rebuild to add support for latest dlc!
